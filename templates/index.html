@@ -1,0 +1,82 @@
+{%- extends "base.html" %}
+
+{% block content %}
+    <div class="ma-10">
+        <v-row>
+            <h2>Foods</h2>
+        </v-row>
+        <v-row>
+            <v-col cols="12">
+{#                <span>Risk</span>#}
+{#                <v-btn-toggle class="pl-2"  v-model="severity" @change="changeSeverity" color="green darken-3">#}
+{#                    <v-btn v-for="severity in risk_levels" :key="severity" :value="severity" small>#}
+{#                        [[severity]]#}
+{#                    </v-btn>#}
+{#                </v-btn-toggle>#}
+                <span>
+                    <strong>[[totalItems]] food[[totalItems == 1 ? '' : 's']]</strong> fit your criteria
+                </span>
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-layout child-flex>
+            <v-data-table :items="foods"
+                              :headers="headers"
+                              :show-expand=true
+                              :server-items-length="totalItems"
+                              :dense=true
+                              :items-per-page="itemsPerPage || 10"
+{#                              @click:row="goToRule"#}
+                              :mobile-breakpoint="0"
+                              :page="Number(pageNumber) || 1"
+{#                              @update:page="changePageNumber"#}
+                              class="foods-table"
+                >
+                </v-data-table>
+            </v-layout>
+        </v-row>
+    </div>
+{% endblock %}
+
+{% block vue %}
+    <script>
+        var api_url = '{{ url_for('foods.list') }}';
+        var app = new Vue({
+            delimiters: ['[[', ']]'],
+            vuetify: new Vuetify(),
+            el: '#app',
+            created: function () {
+                this.getFoods()
+            },
+            data: {
+                itemsPerPage: 10,
+                totalItems: 0,
+                pageNumber: 1,
+                foods: [],
+                headers: [
+                    {text: 'Id', value: 'id', width: "50px"},
+                    {text: 'Name', value: 'name'},
+                    {text: 'Measure', value: 'measure', width: "300px"},
+                    {text: 'Weight', value: 'weight', width: "100px"},
+                ],
+
+            },
+            methods: {
+                changePageNumber(newPageNumber) {
+                    this.pageNumber = newPageNumber
+                    this.getFoods()
+                },
+                changeSeverity() {
+                    this.getFoods()
+                },
+                getFoods() {
+                    axios.post(api_url, {})
+                    .then((data) => {
+                        this.foods = data.data
+                        this.totalItems = data.data.length
+                    })
+                },
+            }
+        });
+    </script>
+{% endblock %}
