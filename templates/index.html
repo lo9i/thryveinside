@@ -70,7 +70,7 @@
                     this.getFoods()
                 },
                 getFoods() {
-                    axios.post(api_url, {})
+                    axios.post(api_url, {filters:[]})
                     .then((data) => {
                         this.foods = data.data
                         this.totalItems = data.data.length
