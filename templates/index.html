@@ -7,12 +7,6 @@
         </v-row>
         <v-row>
             <v-col cols="12">
-                {#                <span>Risk</span>#}
-                {#                <v-btn-toggle class="pl-2"  v-model="severity" @change="changeSeverity" color="green darken-3">#}
-                {#                    <v-btn v-for="severity in risk_levels" :key="severity" :value="severity" small>#}
-                {#                        [[severity]]#}
-                {#                    </v-btn>#}
-                {#                </v-btn-toggle>#}
                 <span>
                     <strong>[[totalItems]] food[[totalItems == 1 ? '' : 's']]</strong> fit your criteria
                 </span>
@@ -34,7 +28,7 @@
                     <template v-slot:expanded-item="{ headers, item }">
                         <td colspan="2"></td>
                         <td :colspan="headers.length-4">
-                            <v-simple-table dense>
+                            <v-simple-table dense class="nutrients-table">
                                 <template v-slot:default>
                                     <thead>
                                     <tr>

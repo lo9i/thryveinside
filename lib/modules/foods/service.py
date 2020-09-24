@@ -1,5 +1,6 @@
 import json
 import logging
+from logging import getLogger, DEBUG
 
 from sqlalchemy.orm import joinedload
 
@@ -17,7 +18,6 @@ from sqlalchemy import (
     desc,
     func, cast, Numeric
 )
-from logging import getLogger, DEBUG
 
 
 logger = getLogger(__name__)
@@ -48,7 +48,6 @@ class FoodsService:
             'results': query.all(),
             'count': total_count
         }
-        # return json.dumps(result, cls=new_alchemy_encoder(), check_circular=False)
 
     def get_food(self, food_id):
         '''
@@ -59,15 +58,10 @@ class FoodsService:
 
         logger.debug("Getting filtered food")
         return Food.query.options(joinedload("nutrients")).filter(Food.id == food_id).first()
-        # return json.dumps(result, cls=new_alchemy_encoder(), check_circular=False)
 
     def _apply_filtering(self, filters):
         if not filters:
             return Food.query
-
-        # from lib import JsonService
-        # sql_filters = JsonService.parse(table, filters)
-        # return query.where(sql_filters)
 
     @staticmethod
     def _apply_paging(query, page):
@@ -76,7 +70,6 @@ class FoodsService:
             query_offset = page.index * page.size
 
             # Check if the requested page index is beyond the end
-
             # If so, then reset to first page.
             if total_count > query_offset:
                 query = query.offset(query_offset).limit(page.size)
