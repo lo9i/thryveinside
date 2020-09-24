@@ -14,4 +14,4 @@ class Filter:
 @dataclass_json(letter_case=LetterCase.CAMEL)
 @dataclass(frozen=True)
 class Request:
-    filters: Optional[List] = field(default_factory=list)
+    filters: Optional[List[Filter]] = field(default_factory=lambda: [])
