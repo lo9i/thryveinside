@@ -7,12 +7,12 @@
         </v-row>
         <v-row>
             <v-col cols="12">
-{#                <span>Risk</span>#}
-{#                <v-btn-toggle class="pl-2"  v-model="severity" @change="changeSeverity" color="green darken-3">#}
-{#                    <v-btn v-for="severity in risk_levels" :key="severity" :value="severity" small>#}
-{#                        [[severity]]#}
-{#                    </v-btn>#}
-{#                </v-btn-toggle>#}
+                {#                <span>Risk</span>#}
+                {#                <v-btn-toggle class="pl-2"  v-model="severity" @change="changeSeverity" color="green darken-3">#}
+                {#                    <v-btn v-for="severity in risk_levels" :key="severity" :value="severity" small>#}
+                {#                        [[severity]]#}
+                {#                    </v-btn>#}
+                {#                </v-btn-toggle>#}
                 <span>
                     <strong>[[totalItems]] food[[totalItems == 1 ? '' : 's']]</strong> fit your criteria
                 </span>
@@ -20,18 +20,45 @@
         </v-row>
         <v-row>
             <v-layout child-flex>
-            <v-data-table :items="foods"
+                <v-data-table :items="foods"
                               :headers="headers"
                               :show-expand=true
                               :server-items-length="totalItems"
                               :dense=true
                               :items-per-page="itemsPerPage || 10"
-{#                              @click:row="goToRule"#}
                               :mobile-breakpoint="0"
                               :page="Number(pageNumber) || 1"
-{#                              @update:page="changePageNumber"#}
+                              @update:page="changePageNumber"
                               class="foods-table"
                 >
+                    <template v-slot:expanded-item="{ headers, item }">
+                        <td colspan="2"></td>
+                        <td :colspan="headers.length-4">
+                            <v-simple-table dense>
+                                <template v-slot:default>
+                                    <thead>
+                                    <tr>
+                                        <th class="text-center" width="50px">#</th>
+                                        <th class="text-left">Name</th>
+                                        <th class="text-center" width="50px">Unit</th>
+                                        <th class="text-right" width="10%">Value</th>
+                                        <th class="text-right" width="10%">Gm</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr v-for="item in item.nutrients" :key="item.id">
+                                        <td class="text-center">[[ item.nutrient.id ]]</td>
+                                        <td class="text-left">[[ item.nutrient.name ]]</td>
+                                        <td class="text-center">[[ item.nutrient.unit ]]</td>
+                                        <td class="text-right">[[ item.nutrient.value ]]</td>
+                                        <td class="text-right">[[ item.nutrient.gm ]]</td>
+                                    </tr>
+                                    </tbody>
+                                </template>
+                            </v-simple-table>
+                        </td>
+                        <td colspan="2"></td>
+                    </template>
                 </v-data-table>
             </v-layout>
         </v-row>
@@ -70,11 +97,11 @@
                     this.getFoods()
                 },
                 getFoods() {
-                    axios.post(api_url, {filters:[]})
-                    .then((data) => {
-                        this.foods = data.data
-                        this.totalItems = data.data.length
-                    })
+                    axios.post(api_url, {filters: [], page: {index: this.pageNumber, size: this.itemsPerPage}})
+                        .then((data) => {
+                            this.foods = data.data.results
+                            this.totalItems = data.data.count
+                        })
                 },
             }
         });

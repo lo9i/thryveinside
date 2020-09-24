@@ -61,6 +61,7 @@ class FoodNutrient(db.Model):
     id: int
     food_id: int
     nutrient_id: int
+    nutrient: Nutrient
 
     id = db.Column(db.Integer, primary_key=True)
     food_id = db.Column(db.Integer, db.ForeignKey('food.id'))

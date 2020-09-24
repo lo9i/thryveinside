@@ -6,6 +6,13 @@ from typing import List, Dict, Optional
 
 @dataclass_json(letter_case=LetterCase.CAMEL)
 @dataclass(frozen=True)
+class Page:
+    index: int
+    size: Optional[int] = 25
+
+
+@dataclass_json(letter_case=LetterCase.CAMEL)
+@dataclass(frozen=True)
 class Filter:
     id: int
     values: List = field(default_factory=lambda: [])
@@ -15,3 +22,5 @@ class Filter:
 @dataclass(frozen=True)
 class Request:
     filters: Optional[List[Filter]] = field(default_factory=lambda: [])
+    page: Optional[Page] = None
+

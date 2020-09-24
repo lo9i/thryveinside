@@ -42,8 +42,12 @@ class FoodsService:
         logger.debug("Getting filtered food")
         request_dict = json.loads(request_str)
         request = Request.from_dict(request_dict)
-        result = self._apply_filtering(request.filters)
-        return result.all()
+        query = self._apply_filtering(request.filters)
+        query, total_count = FoodsService._apply_paging(query, request.page)
+        return {
+            'results': query.all(),
+            'count': total_count
+        }
         # return json.dumps(result, cls=new_alchemy_encoder(), check_circular=False)
 
     def get_food(self, food_id):
@@ -65,3 +69,18 @@ class FoodsService:
         # sql_filters = JsonService.parse(table, filters)
         # return query.where(sql_filters)
 
+    @staticmethod
+    def _apply_paging(query, page):
+        total_count = query.count()
+        if page is not None:
+            query_offset = page.index * page.size
+
+            # Check if the requested page index is beyond the end
+
+            # If so, then reset to first page.
+            if total_count > query_offset:
+                query = query.offset(query_offset).limit(page.size)
+            else:
+                page.index = 0
+
+        return query, total_count
