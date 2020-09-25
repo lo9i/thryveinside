@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from dataclasses_json import dataclass_json, LetterCase
 
-from typing import List, Dict, Optional
+from typing import List, Optional
 
 
 @dataclass_json(letter_case=LetterCase.CAMEL)
@@ -17,12 +17,11 @@ class Filter:
     nutrient_id: int
     operator: str
     value: float
-    # values: List = field(default_factory=lambda: [])
 
 
 @dataclass_json(letter_case=LetterCase.CAMEL)
 @dataclass(frozen=True)
 class Request:
-    filters: Optional[List[Filter]] = field(default_factory=lambda: [])
+    filters: Optional[List[List[Filter]]] = field(default_factory=lambda: [[]])
     page: Optional[Page] = None
 

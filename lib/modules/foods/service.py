@@ -1,13 +1,12 @@
 import json
 from logging import getLogger, DEBUG
 
-from sqlalchemy.orm import joinedload, load_only
+from sqlalchemy.orm import joinedload
 
 from lib.core.models import Food, Nutrient, FoodNutrient
 from modules.foods.request import Request
 
 from sqlalchemy import (
-    func,
     and_,
     or_,
 )
@@ -58,24 +57,45 @@ class FoodsService:
     def _apply_filtering(filters):
         query = Food.query
         # some filters may be invalid
-        if filters:
-            filters = [f for f in filters if f.value is not None and f.value != '' and f.nutrient_id > 0]
+        filters = FoodsService._get_valid_filters(filters)
         if filters:
             query = query.join(FoodNutrient, Food.nutrients)
             for f in filters:
-                query = FoodsService._get_filter(query, f)
+                query = FoodsService._get_and_filter(query, f)
         return query
 
     @staticmethod
-    def _get_filter(query, the_filter):
-        if the_filter.operator == "Equal":
-            return query.filter(and_(FoodNutrient.value != None, FoodNutrient.value == float(the_filter.value), FoodNutrient.nutrient_id == the_filter.nutrient_id))
-        if the_filter.operator == "Greater Than":
-            return query.filter(and_(FoodNutrient.value != None, FoodNutrient.value > float(the_filter.value), FoodNutrient.nutrient_id == the_filter.nutrient_id))
-        if the_filter.operator == "Less Than":
-            return query.filter(and_(FoodNutrient.value != None, FoodNutrient.value < float(the_filter.value), FoodNutrient.nutrient_id == the_filter.nutrient_id))
-        logger.debug(f'Unknown filter type {the_filter.operator}')
+    def _get_valid_filters(filters):
+        valid_filters = []
+        if filters:
+            for filt in filters:
+                or_filters = []
+                for f in filt:
+                    if f.value is not None and f.value != '' and f.nutrient_id > 0:
+                        or_filters.append(f)
+                if or_filters:
+                    valid_filters.append(or_filters)
+        return valid_filters
+
+    @staticmethod
+    def _get_and_filter(query, filters):
+        or_filters = []
+        for f in filters:
+            or_filters.append(FoodsService._get_or_filters(f))
+        query = query.filter(or_(*or_filters))
         return query
+
+    @staticmethod
+    def _get_or_filters(the_filter):
+        if the_filter.operator == "Equal":
+            return and_(FoodNutrient.value != None, FoodNutrient.value == float(the_filter.value), FoodNutrient.nutrient_id == the_filter.nutrient_id)
+        if the_filter.operator == "Greater Than":
+            return and_(FoodNutrient.value != None, FoodNutrient.value > float(the_filter.value), FoodNutrient.nutrient_id == the_filter.nutrient_id)
+        if the_filter.operator == "Less Than":
+            return and_(FoodNutrient.value != None, FoodNutrient.value < float(the_filter.value), FoodNutrient.nutrient_id == the_filter.nutrient_id)
+
+        logger.debug(f'Unknown filter type {the_filter.operator}')
+        raise Exception(f'Unknown filter type {the_filter.operator}')
 
     @staticmethod
     def _apply_paging(query, page):

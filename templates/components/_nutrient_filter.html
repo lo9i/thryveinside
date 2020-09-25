@@ -17,41 +17,45 @@
                         this.nutrients = data.data
                     })
             },
+            addOrFilter() {
+                this.filters.push({'nutrient_id': null, 'operator': 'Greater Than', 'value': null})
+            },
         },
-        template: `<v-row>
-          <v-col class="d-flex" cols="4" sm="1">
-            <v-btn x-small class="mx-2" fab dark color="error" v-on:click="$emit('remove-filter', index)">
-              <v-icon dark>mdi-minus</v-icon>
-            </v-btn>
+        template: `
+          <v-row>
+            <v-col class="d-flex pt-0" cols="12">
+                <v-select
+                  :items="nutrients"
+                  label="Select one"
+                  item-text="name"
+                  item-value="id"
+                  v-model="filter.nutrient_id"
+                  dense
+                ></v-select>
+                <v-select
+                  :items="operands"
+                  label="Select one"
+                  v-model="filter.operator"
+                  dense
+                ></v-select>
+                <v-text-field
+                    dense
+                    type="number"
+                    label="Value"
+                    v-model="filter.value"
+                ></v-text-field>
+                <v-tooltip right>
+                    <template v-slot:activator="{ on, attrs }">
+                        <v-btn x-small class="mx-2" fab dark color="error" v-on:click="$emit('remove-filter', index)" v-bind="attrs"
+                                v-on="on">
+                          <v-icon dark>mdi-minus</v-icon>
+                        </v-btn>
+                    </template>
+                    <span>Remove this condition</span>
+                </v-tooltip>
             </v-col>
-          <v-col class="d-flex" cols="4" sm="3">
-            <v-select
-              :items="nutrients"
-              label="Select one"
-              item-text="name"
-              item-value="id"
-              v-model="filter.nutrient_id"
-              dense
-            ></v-select>
-            </v-col>
-          <v-col class="d-flex" cols="4" sm="3">
-            <v-select
-              :items="operands"
-              label="Select one"
-              v-model="filter.operator"
-              dense
-            ></v-select>
-            </v-col>
-          <v-col class="d-flex" cols="4" sm="3">
-            <v-text-field
-                dense
-                type="number"
-                label="Value"
-                v-model="filter.value"
-            ></v-text-field>
-            </v-input>
-            </v-col>
-        </v-row>`
+     </v-row>
+        `
     })
     ;
 </script>

@@ -1,0 +1,39 @@
+<script>
+    Vue.component('nutrients-filters', {
+        delimiters: ['[[', ']]'],
+        props: ['filters'],
+        data: () => ({
+        }),
+        methods: {
+            addFilter() {
+                this.filters.push([{'nutrient_id': null, 'operator': 'Greater Than', 'value': null }])
+            },
+            removeFilter(index) {
+                this.$delete(this.filters, index)
+                this.$emit('filter-changed')
+                if ( this.filters.length === 0 ) {
+                    this.addFilter()
+                }
+            },
+        },
+        template:
+            `<div class="v-flex full-width">
+                <v-tooltip right>
+                    <template v-slot:activator="{ on, attrs }">
+                        <v-btn x-small class="mx-2" fab dark color="indigo" v-on:click="addFilter" v-bind="attrs"
+                            v-on="on">
+                            <v-icon dark>mdi-plus</v-icon>
+                        </v-btn>
+                    </template>
+                    <span>Add nutrient conditions</span>
+                </v-tooltip>
+                <nutrient-filter-row class="pt-2 pl-3"
+                     v-for="(f, index) in filters"
+                     v-bind:key="index"
+                     v-bind:index="index"
+                     v-bind:orFilters="f"
+                     v-on:remove-filter="removeFilter"
+                ></nutrient-filter-row>
+            </div>`
+    });
+</script>
