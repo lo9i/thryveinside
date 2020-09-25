@@ -5,7 +5,7 @@ from typing import List, Dict, Optional
 
 
 @dataclass_json(letter_case=LetterCase.CAMEL)
-@dataclass(frozen=True)
+@dataclass(frozen=False)
 class Page:
     index: int
     size: Optional[int] = 25

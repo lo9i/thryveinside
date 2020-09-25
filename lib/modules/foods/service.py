@@ -1,9 +1,9 @@
 import json
 from logging import getLogger, DEBUG
 
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, load_only
 
-from lib.core.models import Food, Nutrient
+from lib.core.models import Food, Nutrient, FoodNutrient
 from modules.foods.request import Request
 
 from sqlalchemy import (
@@ -11,13 +11,6 @@ from sqlalchemy import (
     and_,
     or_,
 )
-
-operations = {
-    "Equal": lambda a, b: a == b,
-    "Greater Than": lambda a, b: a > b,
-    "Less Than": lambda a, b: a < b,
-}
-
 
 logger = getLogger(__name__)
 
@@ -64,16 +57,24 @@ class FoodsService:
     @staticmethod
     def _apply_filtering(filters):
         query = Food.query
+        # some filters may be invalid
         if filters:
+            filters = [f for f in filters if f.value is not None and f.value != '' and f.nutrient_id > 0]
+        if filters:
+            query = query.join(FoodNutrient, Food.nutrients)
             for f in filters:
-                query = FoodsService._apply_filter(query, f)
+                query = FoodsService._get_filter(query, f)
         return query
 
     @staticmethod
-    def _apply_filter(query, the_filter):
-        for f in query.all():
-            Nutrient
-        operations[the_filter.operator]
+    def _get_filter(query, the_filter):
+        if the_filter.operator == "Equal":
+            return query.filter(and_(FoodNutrient.value != None, FoodNutrient.value == float(the_filter.value), FoodNutrient.nutrient_id == the_filter.nutrient_id))
+        if the_filter.operator == "Greater Than":
+            return query.filter(and_(FoodNutrient.value != None, FoodNutrient.value > float(the_filter.value), FoodNutrient.nutrient_id == the_filter.nutrient_id))
+        if the_filter.operator == "Less Than":
+            return query.filter(and_(FoodNutrient.value != None, FoodNutrient.value < float(the_filter.value), FoodNutrient.nutrient_id == the_filter.nutrient_id))
+        logger.debug(f'Unknown filter type {the_filter.operator}')
         return query
 
     @staticmethod

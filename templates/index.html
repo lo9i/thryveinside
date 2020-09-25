@@ -11,10 +11,10 @@
             <h2>Foods</h2>
         </v-row>
         <v-row>
-            <nutrients-filters v-bind:filters="filters"/>
+            <nutrients-filters v-bind:filters="filters" v-on:filter-changed="getFoods"/>
         </v-row>
         <v-row>
-            <v-btn x-small class="mx-2" fab dark color="green darken-2" v-on:click="applyFilter">
+            <v-btn x-small class="mx-2" fab dark color="green darken-2" v-on:click="getFoods">
                 <v-icon dark>mdi-filter</v-icon>
             </v-btn>
         </v-row>
@@ -80,7 +80,7 @@
                 totalItems: 0,
                 pageNumber: 1,
                 foods: [],
-                filters: [{'nutrient_id': 203, 'operator': 'Greater Than', 'value': 1 }],
+                filters: [{'nutrient_id': null, 'operator': 'Greater Than', 'value': null }],
                 headers: [
                     {text: 'Id', value: 'id', width: "50px"},
                     {text: 'Name', value: 'name'},
@@ -92,10 +92,6 @@
             methods: {
                 changePageNumber(newPageNumber) {
                     this.pageNumber = newPageNumber
-                    this.getFoods()
-                },
-                applyFilter() {
-                    {#this.filters = [{'nutrient_id': 203, 'operator': 'Greater Than', 'value': 1 }],#}
                     this.getFoods()
                 },
                 getFoods() {
