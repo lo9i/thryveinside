@@ -88,11 +88,11 @@ class FoodsService:
     @staticmethod
     def _get_or_filters(the_filter):
         if the_filter.operator == "Equal":
-            return and_(FoodNutrient.value != None, FoodNutrient.value == float(the_filter.value), FoodNutrient.nutrient_id == the_filter.nutrient_id)
+            return and_(FoodNutrient.gm != None, FoodNutrient.gm == float(the_filter.value), FoodNutrient.nutrient_id == the_filter.nutrient_id)
         if the_filter.operator == "Greater Than":
-            return and_(FoodNutrient.value != None, FoodNutrient.value > float(the_filter.value), FoodNutrient.nutrient_id == the_filter.nutrient_id)
+            return and_(FoodNutrient.gm != None, FoodNutrient.gm > float(the_filter.value), FoodNutrient.nutrient_id == the_filter.nutrient_id)
         if the_filter.operator == "Less Than":
-            return and_(FoodNutrient.value != None, FoodNutrient.value < float(the_filter.value), FoodNutrient.nutrient_id == the_filter.nutrient_id)
+            return and_(FoodNutrient.gm != None, FoodNutrient.gm < float(the_filter.value), FoodNutrient.nutrient_id == the_filter.nutrient_id)
 
         logger.debug(f'Unknown filter type {the_filter.operator}')
         raise Exception(f'Unknown filter type {the_filter.operator}')
