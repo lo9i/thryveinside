@@ -15,8 +15,6 @@ def add_nutrients(data):
         nutrient.id = n['nutrient_id']
         nutrient.name = n['nutrient']
         nutrient.unit = n['unit']
-        nutrient.value = n['value']
-        nutrient.gm = n['gm']
         db.session.add(nutrient)
         db.session.commit()
 
@@ -34,6 +32,10 @@ def add_foods(data):
             food_nutrient = FoodNutrient()
             food_nutrient.food_id = food.id
             food_nutrient.nutrient_id = n['nutrient_id']
+            if n['value'] != '--':
+                food_nutrient.value = n['value']
+            if n['gm'] != '--':
+                food_nutrient.gm = n['gm']
             db.session.add(food_nutrient)
             db.session.commit()
 

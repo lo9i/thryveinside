@@ -1,23 +1,22 @@
 import json
-import logging
 from logging import getLogger, DEBUG
 
 from sqlalchemy.orm import joinedload
 
-from lib.core.models import Food
+from lib.core.models import Food, Nutrient
 from modules.foods.request import Request
 
-logger = logging.getLogger(__name__)
-
 from sqlalchemy import (
-    create_engine,
-    Table,
-    MetaData,
-    select,
-    asc,
-    desc,
-    func, cast, Numeric
+    func,
+    and_,
+    or_,
 )
+
+operations = {
+    "Equal": lambda a, b: a == b,
+    "Greater Than": lambda a, b: a > b,
+    "Less Than": lambda a, b: a < b,
+}
 
 
 logger = getLogger(__name__)
@@ -42,7 +41,7 @@ class FoodsService:
         logger.debug("Getting filtered food")
         request_dict = json.loads(request_str)
         request = Request.from_dict(request_dict)
-        query = self._apply_filtering(request.filters)
+        query = FoodsService._apply_filtering(request.filters)
         query, total_count = FoodsService._apply_paging(query, request.page)
         return {
             'results': query.all(),
@@ -59,9 +58,23 @@ class FoodsService:
         logger.debug("Getting filtered food")
         return Food.query.options(joinedload("nutrients")).filter(Food.id == food_id).first()
 
-    def _apply_filtering(self, filters):
-        if not filters:
-            return Food.query
+    def get_nutrients(self):
+        return Nutrient.query.all()
+
+    @staticmethod
+    def _apply_filtering(filters):
+        query = Food.query
+        if filters:
+            for f in filters:
+                query = FoodsService._apply_filter(query, f)
+        return query
+
+    @staticmethod
+    def _apply_filter(query, the_filter):
+        for f in query.all():
+            Nutrient
+        operations[the_filter.operator]
+        return query
 
     @staticmethod
     def _apply_paging(query, page):

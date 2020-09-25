@@ -1,0 +1,56 @@
+<script>
+    var nutrients_api_url = '{{ url_for('foods.nutrients') }}';
+    Vue.component('nutrient-filter', {
+        props: ['filter', 'index'],
+        delimiters: ['[[', ']]'],
+        created: function () {
+            this.getNutrients()
+        },
+        data: () => ({
+            nutrients: [],
+            operands: ['Equal', 'Greater Than', 'Less Than'],
+        }),
+        methods: {
+            getNutrients() {
+                axios.get(nutrients_api_url)
+                    .then((data) => {
+                        this.nutrients = data.data
+                    })
+            },
+        },
+        template: `<v-row>
+          <v-col class="d-flex" cols="4" sm="1">
+            <v-btn x-small class="mx-2" fab dark color="error" v-on:click="$emit('remove-filter', index)">
+              <v-icon dark>mdi-minus</v-icon>
+            </v-btn>
+            </v-col>
+          <v-col class="d-flex" cols="4" sm="3">
+            <v-select
+              :items="nutrients"
+              label="Select one"
+              item-text="name"
+              item-value="id"
+              v-model="filter.nutrient_id"
+              dense
+            ></v-select>
+            </v-col>
+          <v-col class="d-flex" cols="4" sm="3">
+            <v-select
+              :items="operands"
+              label="Select one"
+              v-model="filter.operator"
+              dense
+            ></v-select>
+            </v-col>
+          <v-col class="d-flex" cols="4" sm="3">
+            <v-text-field
+                dense
+                label="Value"
+                v-model="filter.value"
+            ></v-text-field>
+            </v-input>
+            </v-col>
+        </v-row>`
+    })
+    ;
+</script>

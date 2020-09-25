@@ -14,8 +14,10 @@ class Page:
 @dataclass_json(letter_case=LetterCase.CAMEL)
 @dataclass(frozen=True)
 class Filter:
-    id: int
-    values: List = field(default_factory=lambda: [])
+    nutrient_id: int
+    operator: str
+    value: float
+    # values: List = field(default_factory=lambda: [])
 
 
 @dataclass_json(letter_case=LetterCase.CAMEL)

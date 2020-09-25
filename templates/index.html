@@ -1,16 +1,22 @@
 {%- extends "base.html" %}
 
+{% block components %}
+    {% include ['components/_nutrients_filter.html'] %}
+    {% include ['components/_nutrient_filter.html'] %}
+{% endblock %}
+
 {% block content %}
     <div class="ma-10">
         <v-row>
             <h2>Foods</h2>
         </v-row>
         <v-row>
-            <v-col cols="12">
-                <span>
-                    <strong>[[totalItems]] food[[totalItems == 1 ? '' : 's']]</strong> fit your criteria
-                </span>
-            </v-col>
+            <nutrients-filters v-bind:filters="filters"/>
+        </v-row>
+        <v-row>
+            <v-btn x-small class="mx-2" fab dark color="green darken-2" v-on:click="applyFilter">
+                <v-icon dark>mdi-filter</v-icon>
+            </v-btn>
         </v-row>
         <v-row>
             <v-layout child-flex>
@@ -44,8 +50,8 @@
                                         <td class="text-center">[[ item.nutrient.id ]]</td>
                                         <td class="text-left">[[ item.nutrient.name ]]</td>
                                         <td class="text-center">[[ item.nutrient.unit ]]</td>
-                                        <td class="text-right">[[ item.nutrient.value ]]</td>
-                                        <td class="text-right">[[ item.nutrient.gm ]]</td>
+                                        <td class="text-right">[[ item.value ]]</td>
+                                        <td class="text-right">[[ item.gm ]]</td>
                                     </tr>
                                     </tbody>
                                 </template>
@@ -61,7 +67,7 @@
 
 {% block vue %}
     <script>
-        var api_url = '{{ url_for('foods.list') }}';
+        var foods_api_url = '{{ url_for('foods.index') }}';
         var app = new Vue({
             delimiters: ['[[', ']]'],
             vuetify: new Vuetify(),
@@ -74,6 +80,7 @@
                 totalItems: 0,
                 pageNumber: 1,
                 foods: [],
+                filters: [{'nutrient_id': 203, 'operator': 'Greater Than', 'value': 1 }],
                 headers: [
                     {text: 'Id', value: 'id', width: "50px"},
                     {text: 'Name', value: 'name'},
@@ -87,11 +94,12 @@
                     this.pageNumber = newPageNumber
                     this.getFoods()
                 },
-                changeSeverity() {
+                applyFilter() {
+                    {#this.filters = [{'nutrient_id': 203, 'operator': 'Greater Than', 'value': 1 }],#}
                     this.getFoods()
                 },
                 getFoods() {
-                    axios.post(api_url, {filters: [], page: {index: this.pageNumber, size: this.itemsPerPage}})
+                    axios.post(foods_api_url, {filters: this.filters, page: {index: this.pageNumber, size: this.itemsPerPage}})
                         .then((data) => {
                             this.foods = data.data.results
                             this.totalItems = data.data.count
